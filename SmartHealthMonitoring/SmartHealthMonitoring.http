@@ -1,0 +1,6 @@
+@SmartHealthMonitoring_HostAddress = http://localhost:5095
+
+GET {{SmartHealthMonitoring_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
