@@ -1,0 +1,16 @@
+FROM bitnami/spark:3.3.1
+
+#FROM bitnami/spark:latest
+
+USER root
+RUN apt-get update && apt-get install -y python3-pip
+
+# Add the log4j.properties file
+COPY log4j.properties /opt/bitnami/spark/conf/
+
+# Switch back to the default user
+USER 1001
+
+# Set the SPARK_LOCAL_DIRS environment variable to a directory where the user has write permissions
+ENV SPARK_LOCAL_DIRS=/tmp/spark
+ENV IVY_HOME=/home/sparkuser/.ivy2

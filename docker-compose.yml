@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  spark-master:
+    image: bitnami/spark:3.3.1
+    environment:
+      - SPARK_MODE=master
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    networks:
+      - spark-network
+
+  spark-worker:
+    image: bitnami/spark:3.3.1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_CORES=2
+    networks:
+      - spark-network
+
+  zookeeper:
+    image: zookeeper:3.6.3
+    ports:
+      - "2181:2181"
+    networks:
+      - spark-network
+    volumes:
+      - zookeeper_data:/data
+      - ./zoo.cfg:/conf/zoo.cfg
+      - zookeeper_logs:/data/logs
+    environment:
+      ZOO_LOG_DIR: /data/logs
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    ports:
+      - "9092:9092"
+      - "29092:29092"  # Exposing port 29092 for localhost
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - spark-network
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+      JVM_OPTS: "-Xms32M -Xmx64M"
+    ports:
+      - "9000:9000"
+    depends_on:
+      - kafka
+    networks:
+      - spark-network
+
+  cassandra:
+    image: cassandra:3.11
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_START_RPC=true
+    networks:
+      - spark-network
+    healthcheck:
+      test: ["CMD-SHELL", "nodetool status | grep UN"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - ./initialize-cassandra-keyspace.cql:/docker-entrypoint-initdb.d/initialize-cassandra-keyspace.cql
+
+  cassandra-init:
+    image: cassandra:3.11
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    networks:
+      - spark-network
+    volumes:
+      - ./initialize-cassandra-keyspace.cql:/initialize-cassandra-keyspace.cql
+    command: >
+      sh -c "until cqlsh cassandra -f /initialize-cassandra-keyspace.cql; do echo 'Waiting for Cassandra to be available...'; sleep 5; done"
+
+  spark-submit:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark-submit
+    depends_on:
+      - spark-master
+      - spark-worker
+      - kafka
+      - cassandra-init
+    networks:
+      - spark-network
+    volumes:
+      - ./spark-app:/mnt/data
+      - ./ivy2:/home/sparkuser/.ivy2
+      - ./log4j.properties:/opt/bitnami/spark/conf/log4j.properties
+    command: >
+      /opt/bitnami/spark/bin/spark-submit
+      --master spark://spark-master:7077
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.1,com.datastax.spark:spark-cassandra-connector_2.12:3.3.0
+      --conf 'spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/opt/bitnami/spark/conf/log4j.properties'
+      --conf 'spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/opt/bitnami/spark/conf/log4j.properties'
+      /mnt/data/spark-streaming.py
+
+networks:
+  spark-network:
+    driver: bridge
+
+volumes:
+  zookeeper_data:
+  zookeeper_logs:
