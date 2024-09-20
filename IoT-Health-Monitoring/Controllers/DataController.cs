@@ -8,17 +8,17 @@ namespace IoT_Health_Monitoring.Controllers
     [Route("api/[controller]")]
     public class DataController : ControllerBase
     {
-        private readonly DataService _service;
+        private readonly DataService dataService;
 
-        public DataController(DataService service)
+        public DataController(DataService dataService)
         {
-            _service = service;
+            this.dataService = dataService;
         }
 
         [HttpGet("{sensorNodeId}")]
-        public async Task<ActionResult<DataModel>> GetAggregatedData(Guid sensorNodeId)
+        public async Task<ActionResult<DataModel>> GetAggregatedDataAsync(Guid sensorNodeId)
         {
-            var aggregatedData = await _service.GetAggregatedSensorData(sensorNodeId);
+            var aggregatedData = await dataService.GetAggregatedSensorDataAsync(sensorNodeId);
 
             if (aggregatedData == null)
             {
@@ -26,6 +26,30 @@ namespace IoT_Health_Monitoring.Controllers
             }
 
             return Ok(aggregatedData);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddSensorAndAlarmDataAsync()
+        {
+            string result = "Data inserted successfully!";
+
+            try
+            {
+                string sensorDataFilePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "Csv", "sensor_data.csv");
+                string alarmDataFilePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "Csv", "alarm.csv");
+
+                sensorDataFilePath = Path.GetFullPath(sensorDataFilePath);
+                alarmDataFilePath = Path.GetFullPath(alarmDataFilePath);
+
+                await dataService.InsertSensorDataBatchAsync(sensorDataFilePath);
+                await dataService.InsertAlarmsBatchAsync(alarmDataFilePath);
+            }
+            catch (Exception e)
+            {
+                result = e.Message;
+            }
+            
+            return Ok(result);
         }
     }
 }

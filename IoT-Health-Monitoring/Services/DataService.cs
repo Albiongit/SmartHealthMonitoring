@@ -1,45 +1,50 @@
-﻿using Cassandra;
+﻿using System.Globalization;
+using Cassandra;
 using IoT_Health_Monitoring.Models;
+using TinyCsvParser.Mapping;
+using TinyCsvParser;
+using System.Text;
+using System;
 
 namespace IoT_Health_Monitoring.Services
 {
     public class DataService
     {
-        private readonly Cassandra.ISession _cassandraSession;
+        private readonly Cassandra.ISession cassandraSession;
 
         public DataService(Cassandra.ISession cassandraSession)
         {
-            _cassandraSession = cassandraSession;
+            this.cassandraSession = cassandraSession;
         }
 
-        public async Task<DataModel?> GetAggregatedSensorData(Guid sensorNodeId)
+        public async Task<DataModel?> GetAggregatedSensorDataAsync(Guid sensorNodeId)
         {
-            var sensorNode = await GetSensorNode(sensorNodeId);
+            SensorNodeModel? sensorNode = await GetSensorNodeAsync(sensorNodeId);
 
             if (sensorNode == null)
                 return null;
 
-            var patient = await GetPatient(sensorNode.PatientId);
-            var sensor = await GetSensor(sensorNode.SensorCode);
+            PatientModel? patient = await GetPatientAsync(sensorNode.PatientId);
+            SensorModel? sensor = await GetSensorAsync(sensorNode.SensorCode);
 
-            var sensorDataList = await GetSensorData(sensorNodeId);
+            List<SensorDataModel> sensorDataList = await GetSensorDataAsync(sensorNodeId);
 
             return new DataModel
             {
-                Sensor = sensor,
-                Patient = patient,
+                Sensor = sensor!,
+                Patient = patient!,
                 SensorNode = sensorNode,
                 SensorData = sensorDataList
             };
         }
 
-        private async Task<SensorNodeModel?> GetSensorNode(Guid sensorNodeId)
+        private async Task<SensorNodeModel?> GetSensorNodeAsync(Guid sensorNodeId)
         {
-            var query = "SELECT * FROM sensor_node WHERE node_id = ?";
-            var resultSet = await _cassandraSession.ExecuteAsync(new SimpleStatement(query, sensorNodeId));
+            string query = "SELECT * FROM sensor_node WHERE node_id = ?";
 
-            // Map the result to SensorNodeModel
-            var row = resultSet.FirstOrDefault();
+            RowSet? resultSet = await cassandraSession.ExecuteAsync(new SimpleStatement(query, sensorNodeId));
+            Row? row = resultSet.FirstOrDefault();
+
             if (row != null)
             {
                 return new SensorNodeModel
@@ -56,12 +61,13 @@ namespace IoT_Health_Monitoring.Services
             return null;
         }
 
-        private async Task<PatientModel?> GetPatient(Guid patientId)
+        private async Task<PatientModel?> GetPatientAsync(Guid patientId)
         {
-            var query = "SELECT * FROM patient WHERE patient_id = ?";
-            var resultSet = await _cassandraSession.ExecuteAsync(new SimpleStatement(query, patientId));
+            string query = "SELECT * FROM patient WHERE patient_id = ?";
 
-            var row = resultSet.FirstOrDefault();
+            RowSet? resultSet = await cassandraSession.ExecuteAsync(new SimpleStatement(query, patientId));
+            Row? row = resultSet.FirstOrDefault();
+
             if (row != null)
             {
                 LocalDate birthday = row.GetValue<LocalDate>("birthday");
@@ -79,12 +85,12 @@ namespace IoT_Health_Monitoring.Services
             return null;
         }
 
-        private async Task<SensorModel?> GetSensor(string sensorCode)
+        private async Task<SensorModel?> GetSensorAsync(string sensorCode)
         {
-            var query = "SELECT * FROM sensor WHERE sensor_code = ?";
-            var resultSet = await _cassandraSession.ExecuteAsync(new SimpleStatement(query, sensorCode));
+            string query = "SELECT * FROM sensor WHERE sensor_code = ?";
 
-            var row = resultSet.FirstOrDefault();
+            RowSet? resultSet = await cassandraSession.ExecuteAsync(new SimpleStatement(query, sensorCode));
+            Row? row = resultSet.FirstOrDefault();
 
             if (row != null)
             {
@@ -98,12 +104,12 @@ namespace IoT_Health_Monitoring.Services
             return null;
         }
 
-        private async Task<List<SensorDataModel>> GetSensorData(Guid sensorNodeId)
+        private async Task<List<SensorDataModel>> GetSensorDataAsync(Guid sensorNodeId)
         {
-            var query = "SELECT * FROM sensor_data WHERE sensor_node_id = ? ORDER BY time_stamp DESC";
-            var resultSet = await _cassandraSession.ExecuteAsync(new SimpleStatement(query, sensorNodeId));
+            string query = "SELECT * FROM sensor_data WHERE sensor_node_id = ? ORDER BY time_stamp DESC";
 
-            var sensorDataList = new List<SensorDataModel>();
+            RowSet? resultSet = await cassandraSession.ExecuteAsync(new SimpleStatement(query, sensorNodeId));
+            List<SensorDataModel> sensorDataList = new List<SensorDataModel>();
 
             foreach (Row? row in resultSet)
             {
@@ -120,6 +126,115 @@ namespace IoT_Health_Monitoring.Services
             }
 
             return sensorDataList;
+        }
+
+        public async Task InsertSensorDataBatchAsync(string filePath)
+        {
+            CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
+            CsvSensorDataInsertModelMapping csvMapper = new CsvSensorDataInsertModelMapping();
+            CsvParser<SensorDataInsertModel> csvParser = new CsvParser<SensorDataInsertModel>(csvParserOptions, csvMapper);
+
+            List<CsvMappingResult<SensorDataInsertModel>> result = csvParser.ReadFromFile(filePath, Encoding.ASCII).ToList();
+
+            List<SensorDataInsertModel> records = new List<SensorDataInsertModel>();
+
+            foreach (CsvMappingResult<SensorDataInsertModel> record in result)
+            {
+                if (record.IsValid)
+                {
+                    records.Add(record.Result);
+                }
+                else
+                {
+                    Console.WriteLine($"Error: {record.Error}");
+                }
+            }
+
+            const int batchSize = 200;
+            List<Task> batchTasks = new List<Task>();
+
+            for (int i = 0; i < records.Count; i += batchSize)
+            {
+                var batch = new BatchStatement();
+
+                for (int j = i; j < i + batchSize && j < records.Count; j++)
+                {
+                    var record = records[j];
+                    string query = "INSERT INTO sensor_data (sensor_node_id, time_stamp, body_temperature, pulse_rate, room_humidity, room_temperature) " +
+                                   "VALUES (?, ?, ?, ?, ?, ?)";
+
+                    SimpleStatement statement = new SimpleStatement(query,
+                        record.SensorNodeId,
+                        record.Timestamp,
+                        (float)record.BodyTemperature,
+                        record.PulseRate,
+                        (float)record.RoomHumidity,
+                        (float)record.RoomTemperature);
+
+                    batch.Add(statement);
+                }
+
+                if (!batch.IsEmpty)
+                {
+                    batchTasks.Add(cassandraSession.ExecuteAsync(batch));
+                }
+            }
+
+            await Task.WhenAll(batchTasks);
+        }
+        public async Task InsertAlarmsBatchAsync(string filePath)
+        {
+            CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
+            CsvAlarmInsertModelMapping csvMapper = new CsvAlarmInsertModelMapping();
+            CsvParser<AlarmInsertModel> csvParser = new CsvParser<AlarmInsertModel>(csvParserOptions, csvMapper);
+
+            List<CsvMappingResult<AlarmInsertModel>> result = csvParser.ReadFromFile(filePath, Encoding.ASCII).ToList();
+
+            List<AlarmInsertModel> records = new List<AlarmInsertModel>();
+
+            foreach (CsvMappingResult<AlarmInsertModel> record in result)
+            {
+                if (record.IsValid)
+                {
+                    records.Add(record.Result);
+                }
+                else
+                {
+                    Console.WriteLine($"Error: {record.Error}");
+                }
+            }
+
+            const int batchSize = 200;
+            List<Task> batchTasks = new List<Task>();
+
+            for (int i = 0; i < records.Count; i += batchSize)
+            {
+                var batch = new BatchStatement();
+
+                for (int j = i; j < i + batchSize && j < records.Count; j++)
+                {
+                    var record = records[j];
+                    string query = "INSERT INTO alarm (alarm_id, alarm_cause, alarm_cause_value, alarm_description, sensor_node_id, time_stamp) " +
+                                   "VALUES (?, ?, ?, ?, ?, ?)";
+
+                    SimpleStatement statement = new SimpleStatement(query,
+                        record.AlarmId,
+                        record.AlarmCause,
+                        record.AlarmCauseValue,
+                        record.AlarmDescription,
+                        record.SensorNodeId,
+                        record.TimeStamp);
+
+                    batch.Add(statement);
+                }
+
+                if (!batch.IsEmpty)
+                {
+                    batchTasks.Add(cassandraSession.ExecuteAsync(batch));
+                }
+            }
+
+            await Task.WhenAll(batchTasks);
         }
     }
 }
