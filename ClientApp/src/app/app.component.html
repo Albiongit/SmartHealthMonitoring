@@ -1,226 +1,361 @@
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
-<!-- * * * * * * * to get started with your project! * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<div style="height: 50px"></div>
 
-<style>
-  :host {
-    --bright-blue: oklch(51.01% 0.274 263.83);
-    --electric-violet: oklch(53.18% 0.28 296.97);
-    --french-violet: oklch(47.66% 0.246 305.88);
-    --vivid-pink: oklch(69.02% 0.277 332.77);
-    --hot-red: oklch(61.42% 0.238 15.34);
-    --orange-red: oklch(63.32% 0.24 31.68);
+<div class="container">
+    <mat-card class="dashboard-card">
+        <mat-card-header>
+            <mat-card-title>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">local_hospital</mat-icon>
+                    {{ allSensors[0].manufacturer }} - {{ allSensors[0].sensorName }}
+                </div>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+            <ng-content>
+                <hr style="width: 100%; color: #ebebeb">
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+                    {{ allSensorNodes[0].nodeName }} - {{ allSensorNodes[0].sensorCode }} | {{ allSensorNodes[0].batteryPercentage }}%
+                </div>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+                    {{ allPatients[0].firstName }} {{ allPatients[0].lastName }} | {{ allPatients[0].address }}
+                </div>
+                <hr style="width: 85%; color: #ebebeb">
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+                    {{ allSensorNodes[5].nodeName }} - {{ allSensorNodes[5].sensorCode }} | {{ allSensorNodes[5].batteryPercentage }}%
+                </div>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+                    {{ allPatients[5].firstName }} {{ allPatients[5].lastName }} | {{ allPatients[5].address }}
+                </div>
+                <hr style="width: 85%; color: #ebebeb">
+            </ng-content>
+        </mat-card-content>
+    </mat-card>
 
-    --gray-900: oklch(19.37% 0.006 300.98);
-    --gray-700: oklch(36.98% 0.014 302.71);
-    --gray-400: oklch(70.9% 0.015 304.04);
+    <mat-card class="dashboard-card">
+        <mat-card-header>
+            <mat-card-title>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">local_hospital</mat-icon>
+                    {{ allSensors[1].manufacturer }} - {{ allSensors[1].sensorName }}
+                </div>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+            <ng-content>
+                <hr style="width: 100%; color: #ebebeb">
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+                    {{ allSensorNodes[1].nodeName }} - {{ allSensorNodes[1].sensorCode }} | {{ allSensorNodes[1].batteryPercentage }}%
+                </div>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+                    {{ allPatients[1].firstName }} {{ allPatients[1].lastName }} | {{ allPatients[1].address }}
+                </div>
+                <hr style="width: 85%; color: #ebebeb">
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+                    {{ allSensorNodes[6].nodeName }} - {{ allSensorNodes[6].sensorCode }} | {{ allSensorNodes[6].batteryPercentage }}%
+                </div>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+                    {{ allPatients[6].firstName }} {{ allPatients[6].lastName }} | {{ allPatients[6].address }}
+                </div>
+                <hr style="width: 85%; color: #ebebeb">
+            </ng-content>
+        </mat-card-content>
+    </mat-card>
 
-    --red-to-pink-to-purple-vertical-gradient: linear-gradient(
-      180deg,
-      var(--orange-red) 0%,
-      var(--vivid-pink) 50%,
-      var(--electric-violet) 100%
-    );
+    <mat-card class="dashboard-card">
+        <mat-card-header>
+            <mat-card-title>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">local_hospital</mat-icon>
+                    {{ allSensors[2].manufacturer }} - {{ allSensors[2].sensorName }}
+                </div>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+            <ng-content>
+                <hr style="width: 100%; color: #ebebeb">
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+                    {{ allSensorNodes[2].nodeName }} - {{ allSensorNodes[2].sensorCode }} | {{ allSensorNodes[2].batteryPercentage }}%
+                </div>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+                    {{ allPatients[2].firstName }} {{ allPatients[2].lastName }} | {{ allPatients[2].address }}
+                </div>
+                <hr style="width: 85%; color: #ebebeb">
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+                    {{ allSensorNodes[7].nodeName }} - {{ allSensorNodes[7].sensorCode }} | {{ allSensorNodes[7].batteryPercentage }}%
+                </div>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+                    {{ allPatients[7].firstName }} {{ allPatients[7].lastName }} | {{ allPatients[7].address }}
+                </div>
+                <hr style="width: 85%; color: #ebebeb">
+            </ng-content>
+        </mat-card-content>
+    </mat-card>
 
-    --red-to-pink-to-purple-horizontal-gradient: linear-gradient(
-      90deg,
-      var(--orange-red) 0%,
-      var(--vivid-pink) 50%,
-      var(--electric-violet) 100%
-    );
+    <mat-card class="dashboard-card">
+        <mat-card-header>
+            <mat-card-title>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">local_hospital</mat-icon>
+                    {{ allSensors[3].manufacturer }} - {{ allSensors[3].sensorName }}
+                </div>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+            <ng-content>
+                <hr style="width: 100%; color: #ebebeb">
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+                    {{ allSensorNodes[3].nodeName }} - {{ allSensorNodes[3].sensorCode }} | {{ allSensorNodes[3].batteryPercentage }}%
+                </div>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+                    {{ allPatients[3].firstName }} {{ allPatients[3].lastName }} | {{ allPatients[3].address }}
+                </div>
+                <hr style="width: 85%; color: #ebebeb">
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+                    {{ allSensorNodes[8].nodeName }} - {{ allSensorNodes[8].sensorCode }} | {{ allSensorNodes[8].batteryPercentage }}%
+                </div>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+                    {{ allPatients[8].firstName }} {{ allPatients[8].lastName }} | {{ allPatients[8].address }}
+                </div>
+                <hr style="width: 85%; color: #ebebeb">
+            </ng-content>
+        </mat-card-content>
+    </mat-card>
 
-    --pill-accent: var(--bright-blue);
+    <mat-card class="dashboard-card">
+        <mat-card-header>
+            <mat-card-title>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">local_hospital</mat-icon>
+                    {{ allSensors[4].manufacturer }} - {{ allSensors[4].sensorName }}
+                </div>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+            <ng-content>
+                <hr style="width: 100%; color: #ebebeb">
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+                    {{ allSensorNodes[4].nodeName }} - {{ allSensorNodes[4].sensorCode }} | {{ allSensorNodes[4].batteryPercentage }}%
+                </div>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+                    {{ allPatients[4].firstName }} {{ allPatients[4].lastName }} | {{ allPatients[4].address }}
+                </div>
+                <hr style="width: 85%; color: #ebebeb">
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+                    {{ allSensorNodes[9].nodeName }} - {{ allSensorNodes[9].sensorCode }} | {{ allSensorNodes[9].batteryPercentage }}%
+                </div>
+                <div>
+                    <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+                    {{ allPatients[9].firstName }} {{ allPatients[9].lastName }} | {{ allPatients[9].address }}
+                </div>
+                <hr style="width: 85%; color: #ebebeb">
+            </ng-content>
+        </mat-card-content>
+    </mat-card>
+</div>
 
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-      "Segoe UI Symbol";
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+<div style="height: 50px"></div>
 
-  h1 {
-    font-size: 3.125rem;
-    color: var(--gray-900);
-    font-weight: 500;
-    line-height: 100%;
-    letter-spacing: -0.125rem;
-    margin: 0;
-    font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-      "Segoe UI Symbol";
-  }
-
-  p {
-    margin: 0;
-    color: var(--gray-700);
-  }
-
-  main {
-    width: 100%;
-    min-height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-    box-sizing: inherit;
-    position: relative;
-  }
-
-  .angular-logo {
-    max-width: 9.2rem;
-  }
-
-  .content {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    max-width: 700px;
-    margin-bottom: 3rem;
-  }
-
-  .content h1 {
-    margin-top: 1.75rem;
-  }
-
-  .content p {
-    margin-top: 1.5rem;
-  }
-
-  .divider {
-    width: 1px;
-    background: var(--red-to-pink-to-purple-vertical-gradient);
-    margin-inline: 0.5rem;
-  }
-
-  .pill-group {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-  }
-
-  .pill {
-    display: flex;
-    align-items: center;
-    --pill-accent: var(--bright-blue);
-    background: color-mix(in srgb, var(--pill-accent) 5%, transparent);
-    color: var(--pill-accent);
-    padding-inline: 0.75rem;
-    padding-block: 0.375rem;
-    border-radius: 2.75rem;
-    border: 0;
-    transition: background 0.3s ease;
-    font-family: var(--inter-font);
-    font-size: 0.875rem;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 1.4rem;
-    letter-spacing: -0.00875rem;
-    text-decoration: none;
-  }
-
-  .pill:hover {
-    background: color-mix(in srgb, var(--pill-accent) 15%, transparent);
-  }
-
-  .pill-group .pill:nth-child(6n + 1) {
-    --pill-accent: var(--bright-blue);
-  }
-  .pill-group .pill:nth-child(6n + 2) {
-    --pill-accent: var(--french-violet);
-  }
-  .pill-group .pill:nth-child(6n + 3),
-  .pill-group .pill:nth-child(6n + 4),
-  .pill-group .pill:nth-child(6n + 5) {
-    --pill-accent: var(--hot-red);
-  }
-
-  .pill-group svg {
-    margin-inline-start: 0.25rem;
-  }
-
-  .social-links {
-    display: flex;
-    align-items: center;
-    gap: 0.73rem;
-    margin-top: 1.5rem;
-  }
-
-  .social-links path {
-    transition: fill 0.3s ease;
-    fill: var(--gray-400);
-  }
-
-  .social-links a:hover svg path {
-    fill: var(--gray-900);
-  }
-
-  @media screen and (max-width: 650px) {
-    .content {
-      flex-direction: column;
-      width: max-content;
-    }
-
-    .divider {
-      height: 1px;
-      width: 100%;
-      background: var(--red-to-pink-to-purple-horizontal-gradient);
-      margin-block: 1.5rem;
-    }
-  }
-</style>
-
-<main class="main">
-  <div class="content">
-    <div style="display: block;">
-      <canvas baseChart
-              [data]="pulseRateData"
-              [options]="chartOptions"
-              chartType="line">
-      </canvas>
+<div style="display:flex;"> 
+    <div style="width: 50%;">
+        <mat-card class="chart-card">
+            <mat-card-title style="margin-top:5px; margin-left:10px"> Number of nodes for each sensor </mat-card-title>
+            <mat-card-content class="chart-card-content">
+            <ng-content>
+                <div style="width: 100%; height: 367px"> 
+                    <app-pie-chart
+                        [labels]="sensorNames"
+                        [data]="sensorNodeCounts"
+                        [backgroundColors]="[
+                        'rgb(255, 99, 132)',
+                        'rgb(75, 192, 192)',
+                        'rgb(255, 205, 86)',
+                        'rgb(201, 203, 207)',
+                        'rgb(54, 162, 235)'
+                        ]"
+                  ></app-pie-chart>
+                </div>
+            </ng-content>
+            </mat-card-content>
+        </mat-card>
     </div>
-    
-    <div style="display: block;">
-      <canvas baseChart
-              [data]="bodyTemperatureData"
-              [options]="chartOptions"
-              chartType="line">
-      </canvas>
+    <div style="width: 50%;">
+    <mat-card class="chart-card" >
+        <mat-card-content class="chart-card">
+        <mat-card-title> Number of measurements for each sensor node </mat-card-title>
+        <ng-content>
+            <div style="width: 100%; height: 30%;"> 
+                <app-polar-chart
+                    [labels]="sensorNodes"
+                    [data]="sensorNodeDataCount"
+                    [backgroundColors]="[
+                    'rgb(255, 99, 132)',
+                    'rgb(75, 192, 192)',
+                    'rgb(255, 205, 86)',
+                    'rgb(201, 203, 207)',
+                    'rgb(54, 162, 235)'
+                    ]"
+              ></app-polar-chart>
+            </div>
+        </ng-content>
+        </mat-card-content>
+    </mat-card>
+   </div>
+</div>
+
+<div style="margin-top: 2%; margin-left: 1%">
+    <mat-form-field appearance="fill">
+    <mat-label>Select a sensor node</mat-label>
+    <mat-select (selectionChange)="onSelectSensorNode($event.value)">
+        <mat-option [value]=""> None </mat-option>
+        <mat-option *ngFor="let option of sensors; let i = index" [value]="i">
+            {{ option.sensorNode.nodeName }}
+        </mat-option>
+    </mat-select>
+    </mat-form-field>
+</div>
+
+<div class="container" *ngIf="selectedSensor">
+    <div class="card">
+        <mat-icon style="margin-bottom: -5px;">person</mat-icon>
+        <span> 
+            
+            {{ this.selectedSensor?.patient?.firstName }} 
+            {{ this.selectedSensor?.patient?.lastName }},
+            {{ this.selectedSensor?.patient?.address }},
+            {{ this.selectedSensor?.patient?.gender == "F" ? "Female" : "Male" }}
+        </span>
     </div>
-    
-    <div style="display: block;">
-      <canvas baseChart
-              [data]="roomTemperatureData"
-              [options]="chartOptions"
-              chartType="line">
-      </canvas>
+
+    <div class="card">
+        <mat-icon style="margin-bottom: -5px;">local_hospital</mat-icon>
+        <span> 
+            {{ this.selectedSensor?.sensor?.manufacturer }}
+            {{ this.selectedSensor?.sensor?.sensorName }}
+            {{ this.selectedSensor?.sensor?.sensorCode }}
+        </span>
     </div>
-    
-    <div style="display: block;">
-      <canvas baseChart
-              [data]="roomHumidityData"
-              [options]="chartOptions"
-              chartType="line">
-      </canvas>
+
+    <div class="card">
+        <mat-icon style="margin-bottom: -5px;">important_devices</mat-icon>
+        <span> 
+            {{ this.selectedSensor?.sensorNode?.hospitalName }}
+            {{ this.selectedSensor?.sensorNode?.nodeName }}
+            {{ this.selectedSensor?.sensorNode?.sensorCode }} |
+            {{ this.selectedSensor?.sensorNode?.batteryPercentage }}%
+        </span>
     </div>
-    
   </div>
-</main>
 
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<div style="height: 5%"></div>
 
+<div *ngIf="selectedSensor" style="display:flex"> 
+    <div style="width: 50%">
+        <mat-card class="chart-card">
+            <mat-card-content class="chart-card">
+            <mat-card-title style="margin-top:5px; margin-left:10px"> Pulse rate over time </mat-card-title>
+            <ng-content>
+                <div style="width: 100%; height: 30%;"> 
+                    <app-line-chart
+                        [labels]="labels"
+                        [firstLine]="avgPulseRate"
+                        [chartId]="'myChart2'"
+                        [color]="'red'"
+                        [lineLabel]="'Pulse Rate'">
+                    </app-line-chart>
+                </div>
+            </ng-content>
+            </mat-card-content>
+            <mat-card-footer style="padding: 20px;">
+                <button (click)="getAISuggestionForPulseRates()" 
+                style="background-color: #04AA6D;
+                    border: none;
+                    color: white;
+                    padding: 5px 16px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 16px;
+                    margin: 4px 2px;
+                    cursor: pointer;"> 
+                    Get AI Suggestion about pulse rates 
+                </button>
+                <div *ngIf="pulseAIResponse">
+                    <p>{{ pulseAIResponse }}</p>
+                </div>
+            </mat-card-footer>
+        </mat-card>
+    </div>
+    <div style="width: 50%">
+    <mat-card class="chart-card" >
+        <mat-card-content class="chart-card">
+        <mat-card-title style="margin-top:5px; margin-left:10px"> Body temperature over time </mat-card-title>
+        <ng-content>
+            <div style="width: 100%; height: 30%;"> 
+                <app-line-chart
+                [labels]="labels"
+                [chartId]="'myChart1'"
+                [firstLine]="avgBodyTemp"
+                [color]="'blue'"
+                [lineLabel]="'Body Temperature'">
+                </app-line-chart>
+            </div>
+        </ng-content>
+        </mat-card-content>
+        <mat-card-footer style="padding: 20px;">
+            <button (click)="getAISuggestionForBodyTemp()" 
+            style="background-color: #04AA6D;
+                border: none;
+                color: white;
+                padding: 5px 16px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;"> 
+                Get AI Suggestion about body temperature
+            </button>
+            <div *ngIf="bodyTempAIResponse">
+                <p>{{ bodyTempAIResponse }}</p>
+            </div>
+        </mat-card-footer>
+    </mat-card>
+   </div>
+</div>
 
-<!-- <router-outlet /> -->
+<div *ngIf="selectedSensor" style="margin-top: 2%;">
+    <mat-card class="chart-card">
+        <mat-card-content class="chart-card">
+          <mat-card-title style="margin-top:5px; margin-left:10px">  Room statistics over time </mat-card-title>
+          <ng-content>
+            <div style="width:100%;height:30%;"> 
+                <app-bar-chart
+                    [labels]="roomLabels"
+                    [first]="avgRoomHumidity"
+                    [second]="avgRoomTemp"
+                    [labelNames]="['Room Humidity', 'Room Temperature']">
+                </app-bar-chart>
+            </div>
+          </ng-content>
+        </mat-card-content>
+      </mat-card>
+</div>

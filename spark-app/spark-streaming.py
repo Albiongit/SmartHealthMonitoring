@@ -46,34 +46,45 @@ logger.info(df)
 
 df = df.withColumn("time_stamp", to_timestamp(col("time_stamp"), "yyyy-MM-dd HH:mm:ss"))
 
+generate_uuid = udf(lambda: str(uuid.uuid4()), StringType())
+
 def generate_alarms(batch_df):
     alarms = []
 
     alarm_conditions = [
-        (("body_temperature", 35.5, 37.0), "Temperature is too low", "Temperature is too high"),
-        (("room_temperature", 20.0, 24.0), "Room temperature is too low", "Room temperature is too high"),
-        (("room_humidity", 30.0, 60.0), "Room humidity is too low", "Room humidity is too high"),
-        (("pulse_rate", 60, 100), "Pulse rate is too low", "Pulse rate is too high")
+        ("body_temperature", 35.5, 37.0, "Temperature is too low", "Temperature is too high"),
+        ("room_temperature", 20.0, 24.0, "Room temperature is too low", "Room temperature is too high"),
+        ("room_humidity", 30.0, 60.0, "Room humidity is too low", "Room humidity is too high"),
+        ("pulse_rate", 60, 100, "Pulse rate is too low", "Pulse rate is too high")
     ]
 
-    for column, low_threshold, high_threshold in alarm_conditions:
+    for column, low_threshold, high_threshold, low_msg, high_msg in alarm_conditions:
         temp_alarms = batch_df \
             .withColumn("alarm_description",
-                        when(col(column[0]) < low_threshold, low_threshold[1])
-                        .when(col(column[0]) > high_threshold, high_threshold[2])) \
+                        when(col(column) < low_threshold, low_msg)
+                        .when(col(column) > high_threshold, high_msg)) \
             .filter(col("alarm_description").isNotNull()) \
-            .withColumn("alarm_id", lit(str(uuid.uuid4()))) \
-            .withColumn("alarm_cause", lit(column[0])) \
-            .withColumn("alarm_cause_value", col(column[0])) \
-            .withColumn("time_stamp", current_timestamp()) \
+            .withColumn("alarm_id", generate_uuid()) \
+            .withColumn("alarm_cause", lit(column)) \
+            .withColumn("alarm_cause_value", col(column)) \
             .select("alarm_id", "time_stamp", "alarm_cause", "alarm_cause_value", "alarm_description", "sensor_node_id")
 
-        alarms.append(temp_alarms)
+        logger.info(f"Printing alarms for condition {column[0]}:")
+        temp_alarms.show()
 
+        if temp_alarms.count() > 0:
+            alarms.append(temp_alarms)
+        else:
+            logger.info(f"No alarms generated for {column}.")
+
+    print(alarms)
+    
     if alarms:
         combined_alarms = alarms[0]
         for alarm_df in alarms[1:]:
             combined_alarms = combined_alarms.union(alarm_df)
+            print("combined alarms")
+            combined_alarms.show(truncate=False)
         return combined_alarms
     return None
 

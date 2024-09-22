@@ -1,10 +1,8 @@
-﻿using System.Globalization;
+﻿using System.Text;
 using Cassandra;
 using IoT_Health_Monitoring.Models;
-using TinyCsvParser.Mapping;
 using TinyCsvParser;
-using System.Text;
-using System;
+using TinyCsvParser.Mapping;
 
 namespace IoT_Health_Monitoring.Services
 {
@@ -17,12 +15,23 @@ namespace IoT_Health_Monitoring.Services
             this.cassandraSession = cassandraSession;
         }
 
-        public async Task<DataModel?> GetAggregatedSensorDataAsync(Guid sensorNodeId)
+        public async Task<List<DataModel?>> GetAggregatedSensorDataAsync()
+        {
+            List<Task<DataModel?>> tasks = new List<Task<DataModel?>>();
+
+            foreach (Guid id in DataGeneratorService.SensorNodeIds)
+            {
+                tasks.Add(GetSensorNodeDataAsync(id));
+            }
+
+            return (await Task.WhenAll(tasks)).ToList();
+        }
+
+        private async Task<DataModel?> GetSensorNodeDataAsync(Guid sensorNodeId)
         {
             SensorNodeModel? sensorNode = await GetSensorNodeAsync(sensorNodeId);
 
-            if (sensorNode == null)
-                return null;
+            if (sensorNode == null) return null;
 
             PatientModel? patient = await GetPatientAsync(sensorNode.PatientId);
             SensorModel? sensor = await GetSensorAsync(sensorNode.SensorCode);
@@ -34,7 +43,7 @@ namespace IoT_Health_Monitoring.Services
                 Sensor = sensor!,
                 Patient = patient!,
                 SensorNode = sensorNode,
-                SensorData = sensorDataList
+                SensorData = sensorDataList,
             };
         }
 
@@ -117,7 +126,7 @@ namespace IoT_Health_Monitoring.Services
 
                 sensorDataList.Add(new SensorDataModel
                 {
-                    Timestamp = new DateTime(timestamp.Year, timestamp.Month, timestamp.Day),
+                    Timestamp = new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, timestamp.Hour, timestamp.Minute, timestamp.Second),
                     PulseRate = row.GetValue<int>("pulse_rate"),
                     BodyTemperature = (double)row.GetValue<float>("body_temperature"),
                     RoomTemperature = (double)row.GetValue<float>("room_temperature"),

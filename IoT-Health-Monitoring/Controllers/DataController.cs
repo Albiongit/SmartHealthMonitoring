@@ -15,10 +15,10 @@ namespace IoT_Health_Monitoring.Controllers
             this.dataService = dataService;
         }
 
-        [HttpGet("{sensorNodeId}")]
-        public async Task<ActionResult<DataModel>> GetAggregatedDataAsync(Guid sensorNodeId)
+        [HttpGet]
+        public async Task<ActionResult<List<DataModel?>>> GetAggregatedDataAsync()
         {
-            var aggregatedData = await dataService.GetAggregatedSensorDataAsync(sensorNodeId);
+            var aggregatedData = await dataService.GetAggregatedSensorDataAsync();
 
             if (aggregatedData == null)
             {

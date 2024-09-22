@@ -54,13 +54,13 @@ CREATE TABLE IF NOT EXISTS alarm (
 );
 
 INSERT INTO health_data.sensor (sensor_code, sensor_name, manufacturer)
-VALUES ('SENS001', 'Heart Rate Monitor', 'MedTech Inc.');
+VALUES ('SENS001', 'Vital Sign Monitor', 'MedTech Inc.');
 INSERT INTO health_data.sensor (sensor_code, sensor_name, manufacturer)
-VALUES ('SENS002', 'Blood Pressure Monitor', 'HealthCorp Ltd.');
+VALUES ('SENS002', 'Health Monitoring Device', 'HealthCorp Ltd.');
 INSERT INTO health_data.sensor (sensor_code, sensor_name, manufacturer)
-VALUES ('SENS003', 'Body Temperature Sensor', 'BioHealth Devices');
+VALUES ('SENS003', 'Environmental Sensor', 'BioHealth Devices');
 INSERT INTO health_data.sensor (sensor_code, sensor_name, manufacturer)
-VALUES ('SENS004', 'Multi-Vital Sensor', 'WellBeing Technologies');
+VALUES ('SENS004', 'Multi-Parameter Sensor', 'WellBeing Technologies');
 INSERT INTO health_data.sensor (sensor_code, sensor_name, manufacturer)
 VALUES ('SENS005', 'Advanced Health Monitor', 'SmartHealth Systems');
 

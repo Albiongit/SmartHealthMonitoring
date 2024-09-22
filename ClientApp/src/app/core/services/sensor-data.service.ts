@@ -1,8 +1,31 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// Define your model here
+@Injectable({
+  providedIn: 'root',
+})
+export class SensorDataService {
+  private baseUrl = 'https://localhost:44342/api'; 
+
+  constructor(private http: HttpClient) {}
+
+  getAggregatedData(): Observable<AggregatedSensorDataModel[]> {
+    return this.http.get<AggregatedSensorDataModel[]>(`${this.baseUrl}/Data/`);
+  }
+
+  addSensorAndAlarmData(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/Data/AddSensorAndAlarmData`, data);
+  }
+
+  generateData(nrOfRows: number): Observable<any> {
+    const params = new HttpParams().set('nrOfRows', nrOfRows.toString());
+    return this.http.post(`${this.baseUrl}/Simulator/GenerateData`, {}, { params });
+  }
+}
+
+
+
 interface SensorDataModel {
   timestamp: Date;
   pulseRate: number;
@@ -11,41 +34,44 @@ interface SensorDataModel {
   roomHumidity: number;
 }
 
-interface AggregatedSensorDataModel {
-  sensor: {
-    sensorCode: string;
-    sensorName: string;
-    manufacturer: string;
-  };
-  patient: {
-    patientId: string;
-    firstName: string;
-    lastName: string;
-    birthday: Date;
-    gender: string;
-    address: string;
-  };
-  sensorNode: {
-    nodeId: string;
-    nodeName: string;
-    batteryPercentage: number;
-    hospitalName: string;
-    patientId: string;
-    sensorCode: string;
-  };
-  sensorData: SensorDataModel[];
+interface PatientModel {
+  patientId: string;
+  firstName: string;
+  lastName: string;
+  birthday: Date;
+  gender: string;
+  address: string;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
-export class SensorDataService {
-  private apiUrl = 'https://localhost:5001/api/aggregatedsensordata'; // Update with your actual API URL
+interface SensorModel {
+  sensorCode: string;
+  sensorName: string;
+  manufacturer: string;
+}
 
-  constructor(private http: HttpClient) {}
+interface SensorNodeModel {
+  nodeId: string;
+  nodeName: string;
+  batteryPercentage: number;
+  hospitalName: string;
+  patientId: string;
+  sensorCode: string;
+}
 
-  // Fetch the aggregated sensor data by sensor node id
-  getAggregatedSensorData(sensorNodeId: string): Observable<AggregatedSensorDataModel> {
-    return this.http.get<AggregatedSensorDataModel>(`${this.apiUrl}/${sensorNodeId}`);
-  }
+interface AlarmInsertModel
+{
+    alarmId: string;
+    alarmCause: string;
+    alarmCauseValue: number;
+    alarmDescription: string;
+    sensorNodeId: string;
+    timeStamp: Date;
+}
+
+interface AggregatedSensorDataModel {
+  sensor: SensorModel;
+  patient: PatientModel;
+  sensorNode: SensorNodeModel;
+  sensorData: SensorDataModel[];
+  alarmData: AlarmInsertModel[];
 }
